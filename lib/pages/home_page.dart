@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
+import 'package:icalc/models/button.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -10,6 +12,12 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   String result = "14555";
+  @override
+  void initState() {
+    SystemChrome.setEnabledSystemUIOverlays([]); //enable fullscreen
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -28,14 +36,13 @@ class _HomePageState extends State<HomePage> {
                 overflow: TextOverflow.ellipsis,
                 style: TextStyle(
                     color: Colors.white,
-                    fontSize: result.length > 5 ? 60 : 100,
+                    fontSize: result.length > 5 ? 60 : 80,
                     fontWeight: FontWeight.w200),
               ),
             ),
             SizedBox(height: 15),
             Container(
-              color: Colors.orange..shade800,
-              height: MediaQuery.of(context).size.height * 0.6,
+              height: MediaQuery.of(context).size.height * 0.69,
               child: _buildButtonGrid(),
             )
           ],
@@ -52,14 +59,26 @@ class _HomePageState extends State<HomePage> {
     return StaggeredGridView.countBuilder(
       crossAxisCount: 4,
       padding: EdgeInsets.zero,
-      itemCount: 15,
+      itemCount: buttons.length,
       itemBuilder: (context, index) {
+        final button = buttons[index];
         return MaterialButton(
-          onPressed: () {},
-          child: Text("$index"),
-        );
+            onPressed: () {},
+            padding: button.value == '0'
+                ? EdgeInsets.only(right: 100)
+                : EdgeInsets.zero,
+            shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.all(Radius.circular(60))),
+            color: button.bgColor,
+            child: Text(
+              button.value,
+              style: TextStyle(color: button.fgColor, fontSize: 30),
+            ));
       },
-      staggeredTileBuilder: (index) => StaggeredTile.count(1, 1),
+      mainAxisSpacing: 10,
+      crossAxisSpacing: 10,
+      staggeredTileBuilder: (index) =>
+          StaggeredTile.count(buttons[index].value == '0' ? 2 : 1, 1),
     );
   }
 }
